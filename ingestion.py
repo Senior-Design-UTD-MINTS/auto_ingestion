@@ -16,7 +16,6 @@ def get_druid_install():
 
 
 # have to split the URL like this because of pythons HTTP API
-# NOTE: var DRUID_INSTALL is hardcoded, this must be changed for your system
 MINTS_BASE_URL = "mintsdata.utdallas.edu:4200"
 MINTS_RESOURCE_URL = "/api/001e06305a12/latestData.json"
 DRUID_INSTALL = get_druid_install()
