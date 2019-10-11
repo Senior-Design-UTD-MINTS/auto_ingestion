@@ -1,0 +1,194 @@
+{
+    "type": "index_parallel",
+    "spec": {
+        "ioConfig": {
+            "type": "index_parallel",
+            "firehose": {
+                "type": "local",
+                "baseDir": "/home/raze/Projects/senior_project/auto_ingestion",
+                "filter": "updates.json"
+            },
+            "appendToExisting": true
+        },
+        "tuningConfig": {
+            "type": "index_parallel"
+        },
+        "dataSchema": {
+            "dataSource": "INITIAL_DATA",
+            "granularitySpec": {
+                "type": "uniform",
+                "segmentGranularity": "DAY",
+                "queryGranularity": "HOUR",
+                "rollup": true
+            },
+            "parser": {
+                "type": "string",
+                "parseSpec": {
+                    "format": "json",
+                    "timestampSpec": {
+                        "column": "dateTime",
+                        "format": "iso"
+                    },
+                    "hasHeaderRow": true,
+                    "dimensionsSpec": {
+                        "dimensions": [
+                            {
+                                "name": "Latitude",
+                                "type": "double"
+                            },
+                            {
+                                "name": "Longitude",
+                                "type": "double"
+                            },
+                            {
+                                "name": "Altitude",
+                                "type": "double"
+                            },
+                            {
+                                "name": "Bin0",
+                                "type": "double"
+                            },
+                            {
+                                "name": "Bin1",
+                                "type": "double"
+                            },
+                            {
+                                "name": "Bin2",
+                                "type": "double"
+                            },
+                            {
+                                "name": "Bin3",
+                                "type": "double"
+                            },
+                            {
+                                "name": "Bin4",
+                                "type": "double"
+                            },
+                            {
+                                "name": "Bin5",
+                                "type": "double"
+                            },
+                            {
+                                "name": "Bin6",
+                                "type": "double"
+                            },
+                            {
+                                "name": "Bin7",
+                                "type": "double"
+                            },
+                            {
+                                "name": "Bin8",
+                                "type": "double"
+                            },
+                            {
+                                "name": "Bin9",
+                                "type": "double"
+                            },
+                            {
+                                "name": "Bin10",
+                                "type": "double"
+                            },
+                            {
+                                "name": "Bin11",
+                                "type": "double"
+                            },
+                            {
+                                "name": "Bin12",
+                                "type": "double"
+                            },
+                            {
+                                "name": "Bin13",
+                                "type": "double"
+                            },
+                            {
+                                "name": "Bin14",
+                                "type": "double"
+                            },
+                            {
+                                "name": "Bin15",
+                                "type": "double"
+                            },
+                            {
+                                "name": "PM1",
+                                "type": "double"
+                            },
+                            {
+                                "name": "PM2_5",
+                                "type": "double"
+                            },
+                            {
+                                "name": "PM4",
+                                "type": "double"
+                            },
+                            {
+                                "name": "PM10",
+                                "type": "double"
+                            },
+                            {
+                                "name": "PMTotal",
+                                "type": "double"
+                            },
+                            {
+                                "name": "dCn",
+                                "type": "double"
+                            },
+                            {
+                                "name": "Temperature",
+                                "type": "double"
+                            },
+                            {
+                                "name": "Humidity",
+                                "type": "double"
+                            },
+                            {
+                                "name": "Pressure",
+                                "type": "double"
+                            }
+                        ]
+                    }
+                }
+            },
+            "metricsSpec": [
+                {
+                    "name": "count",
+                    "type": "count"
+                },
+                {
+                    "name": "sum_Bin9",
+                    "type": "longSum",
+                    "fieldName": "Bin9"
+                },
+                {
+                    "name": "sum_Bin10",
+                    "type": "longSum",
+                    "fieldName": "Bin10"
+                },
+                {
+                    "name": "sum_Bin11",
+                    "type": "longSum",
+                    "fieldName": "Bin11"
+                },
+                {
+                    "name": "sum_Bin12",
+                    "type": "longSum",
+                    "fieldName": "Bin12"
+                },
+                {
+                    "name": "sum_Bin13",
+                    "type": "longSum",
+                    "fieldName": "Bin13"
+                },
+                {
+                    "name": "sum_Bin14",
+                    "type": "longSum",
+                    "fieldName": "Bin14"
+                },
+                {
+                    "name": "sum_Bin15",
+                    "type": "longSum",
+                    "fieldName": "Bin15"
+                }
+            ]
+        }
+    }
+}
