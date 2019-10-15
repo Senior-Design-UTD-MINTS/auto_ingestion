@@ -2,6 +2,8 @@ import json
 import http.client
 import os
 import sys
+import schedule
+import datetime
 
 DRUID_INSTALL_PATH_ENV_VAR = "DRUID_INSTALL_PATH"
 
@@ -28,6 +30,7 @@ BASE_DIR = os.getcwd()
 
 
 def job():
+    print("ran at time {}".format(datetime.datetime.now()))
     # download latest data from MINTS
     mints_conn = http.client.HTTPConnection(MINTS_BASE_URL)
     mints_conn.request("GET", MINTS_RESOURCE_URL)
@@ -64,4 +67,9 @@ def job():
 
 
 # start of script
+schedule.every().minute.do(job)
+
+print("starting at time {}".format(datetime.datetime.now()))
 job()
+while True:
+    schedule.run_pending()
