@@ -29,6 +29,18 @@ OUTPUT_JSON_FILENAME = "updates.json"
 BASE_DIR = os.getcwd()
 
 
+def setup_upload_spec():
+    # updating the update-spec.json to be located in our present directory
+    update_json_fh = open(DRUID_JSON_SPEC, "r")
+    update_json = json.loads(update_json_fh.read())
+    update_json_fh.close()
+
+    update_json["spec"]["ioConfig"]["firehose"]["baseDir"] = BASE_DIR
+    update_json_fh = open(DRUID_JSON_SPEC, "w")
+    update_json_fh.write(json.dumps(update_json))
+    update_json_fh.close()
+
+
 def job():
     print("ran at time {}".format(datetime.datetime.now()))
     # download latest data from MINTS
@@ -47,16 +59,6 @@ def job():
 
     update_file.close()
 
-    # updating the update-spec.json to be located in our present directory
-    update_json_fh = open(DRUID_JSON_SPEC, "r")
-    update_json = json.loads(update_json_fh.read())
-    update_json_fh.close()
-
-    update_json["spec"]["ioConfig"]["firehose"]["baseDir"] = BASE_DIR
-    update_json_fh = open(DRUID_JSON_SPEC, "w")
-    update_json_fh.write(json.dumps(update_json))
-    update_json_fh.close()
-
     # run the script provided by druid to append to our datasource, as specified by the spec
     script = "{}/{} --file {}/{} --url {}:{}".format(
         DRUID_INSTALL, DRUID_UPLOAD_SCRIPT, BASE_DIR, DRUID_JSON_SPEC, DRUID_URL, DRUID_PORT)
@@ -67,6 +69,8 @@ def job():
 
 
 # start of script
+setup_upload_spec()
+
 schedule.every().minute.do(job)
 
 print("starting at time {}".format(datetime.datetime.now()))
