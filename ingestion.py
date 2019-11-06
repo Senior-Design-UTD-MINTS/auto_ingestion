@@ -41,6 +41,7 @@ def setup_upload_spec():
     update_json_fh.close()
 
 
+
 def update_table_name(table_name):
     # updating the update-spec.json to be located in our present directory
     update_json_fh = open(DRUID_JSON_SPEC, "r")
