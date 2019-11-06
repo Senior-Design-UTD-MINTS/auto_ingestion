@@ -34,12 +34,11 @@ def setup_upload_spec():
     update_json_fh = open(DRUID_JSON_SPEC, "r")
     update_json = json.loads(update_json_fh.read())
     update_json_fh.close()
-
+    
     update_json["spec"]["ioConfig"]["firehose"]["baseDir"] = BASE_DIR
     update_json_fh = open(DRUID_JSON_SPEC, "w")
     update_json_fh.write(json.dumps(update_json))
     update_json_fh.close()
-
 
 
 def update_table_name(table_name):
@@ -64,7 +63,7 @@ def job():
         downloaded_entries[sensor] = list()
 
     for sensor in MINTS_RESOURCES:
-        mints_conn.request("GET", "/api/{}/latestData.json/".format(sensor))
+        mints_conn.request("GET", "/api/{}/latestData.json".format(sensor))
         raw_response_body = mints_conn.getresponse().read().decode("utf-8")
         entries_json = json.loads(raw_response_body)
         for entry in entries_json["entries"]:
