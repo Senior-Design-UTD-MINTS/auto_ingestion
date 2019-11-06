@@ -34,7 +34,7 @@ def setup_upload_spec():
     update_json_fh = open(DRUID_JSON_SPEC, "r")
     update_json = json.loads(update_json_fh.read())
     update_json_fh.close()
-
+    
     update_json["spec"]["ioConfig"]["firehose"]["baseDir"] = BASE_DIR
     update_json_fh = open(DRUID_JSON_SPEC, "w")
     update_json_fh.write(json.dumps(update_json))
