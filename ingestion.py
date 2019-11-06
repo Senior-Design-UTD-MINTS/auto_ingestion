@@ -4,6 +4,7 @@ import os
 import sys
 import schedule
 import datetime
+import subprocess
 
 DRUID_INSTALL_PATH_ENV_VAR = "DRUID_INSTALL_PATH"
 
@@ -41,14 +42,15 @@ def setup_upload_spec():
     update_json_fh.close()
 
 
-def update_table_name(table_name):
+def update_table_name(table_name, updates_filename, update_spec_filename):
     # updating the update-spec.json to be located in our present directory
     update_json_fh = open(DRUID_JSON_SPEC, "r")
     update_json = json.loads(update_json_fh.read())
     update_json_fh.close()
 
     update_json["spec"]["dataSchema"]["dataSource"] = table_name
-    update_json_fh = open(DRUID_JSON_SPEC, "w")
+    update_json["spec"]["ioConfig"]["firehose"]["filter"] = updates_filename
+    update_json_fh = open(update_spec_filename, "w")
     update_json_fh.write(json.dumps(update_json))
     update_json_fh.close()
 
@@ -72,22 +74,25 @@ def job():
     # create a new json file to upload to druid
 
     for sensor_id, entries in downloaded_entries.items():
+        table_name = "MINTS_" + sensor_id
+        updates_filename = "updates_{}.json".format(sensor_id)
+        update_spec_filename = "update-spec-{}.json".format(sensor_id)
         # write entries into updates.json file
-        update_file = open(OUTPUT_JSON_FILENAME, "w")
+        update_file = open(updates_filename, "w")
         for entry in entries:
             string = json.dumps(entry)
             update_file.write(string)
             update_file.write("\n")
         update_file.close()
         # change the table name of our updateSpec.json
-        update_table_name("MINTS_" + sensor_id)
+        update_table_name(table_name, updates_filename, update_spec_filename)
         # run the script provided by druid to append to our datasource, as specified by the spec
         script = "{}/{} --file {}/{} --url {}:{}".format(
-            DRUID_INSTALL, DRUID_UPLOAD_SCRIPT, BASE_DIR, DRUID_JSON_SPEC, DRUID_URL, DRUID_PORT)
+            DRUID_INSTALL, DRUID_UPLOAD_SCRIPT, BASE_DIR, update_spec_filename, DRUID_URL, DRUID_PORT)
         print("attempting to execute the following script:")
         print(script)
         print("\n")
-        os.system(script)
+        subprocess.Popen(script, shell=True)
 
 
 # start of script
