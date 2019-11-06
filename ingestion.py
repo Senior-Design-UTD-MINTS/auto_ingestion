@@ -63,7 +63,7 @@ def job():
         downloaded_entries[sensor] = list()
 
     for sensor in MINTS_RESOURCES:
-        mints_conn.request("GET", "/api/{}/latestData.json/".format(sensor))
+        mints_conn.request("GET", "/api/{}/latestData.json".format(sensor))
         raw_response_body = mints_conn.getresponse().read().decode("utf-8")
         entries_json = json.loads(raw_response_body)
         for entry in entries_json["entries"]:
