@@ -5,6 +5,7 @@ import sys
 import schedule
 import datetime
 import subprocess
+import checkSensors
 
 DRUID_INSTALL_PATH_ENV_VAR = "DRUID_INSTALL_PATH"
 
@@ -20,8 +21,8 @@ def get_druid_install():
 
 # have to split the URL like this because of pythons HTTP API
 MINTS_BASE_URL = "mintsdata.utdallas.edu:4200"
-MINTS_RESOURCES = {"001e06305a12", "001e06323a06"}
-DRUID_INSTALL = get_druid_install()
+MINTS_RESOURCES = checkSensors.getSensors()
+DRUID_INSTALL = "/Users/kameron/Downloads/apache-druid-0.16.0-incubating"
 DRUID_UPLOAD_SCRIPT = "bin/post-index-task"
 DRUID_URL = "http://localhost"
 DRUID_PORT = "8081"
@@ -35,7 +36,7 @@ def setup_upload_spec():
     update_json_fh = open(DRUID_JSON_SPEC, "r")
     update_json = json.loads(update_json_fh.read())
     update_json_fh.close()
-    
+
     update_json["spec"]["ioConfig"]["firehose"]["baseDir"] = BASE_DIR
     update_json_fh = open(DRUID_JSON_SPEC, "w")
     update_json_fh.write(json.dumps(update_json))
