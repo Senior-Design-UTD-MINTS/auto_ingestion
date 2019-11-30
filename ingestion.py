@@ -22,7 +22,7 @@ def get_druid_install():
 # have to split the URL like this because of pythons HTTP API
 MINTS_BASE_URL = "mintsdata.utdallas.edu:4200"
 MINTS_RESOURCES = checkSensors.getSensors()
-DRUID_INSTALL = "/Users/kameron/Downloads/apache-druid-0.16.0-incubating"
+DRUID_INSTALL = get_druid_install()
 DRUID_UPLOAD_SCRIPT = "bin/post-index-task"
 DRUID_URL = "http://localhost"
 DRUID_PORT = "8081"
