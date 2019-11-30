@@ -21,7 +21,7 @@ def get_druid_install():
 
 # have to split the URL like this because of pythons HTTP API
 MINTS_BASE_URL = "mintsdata.utdallas.edu:4200"
-MINTS_RESOURCES = checkSensors.getSensors()
+PHANTOMJS_INSTALL = checkSensors.get_phantomJS_path()
 DRUID_INSTALL = get_druid_install()
 DRUID_UPLOAD_SCRIPT = "bin/post-index-task"
 DRUID_URL = "http://localhost"
@@ -56,16 +56,24 @@ def update_table_name(table_name, updates_filename, update_spec_filename):
     update_json_fh.close()
 
 
+def mints_sensors():
+    return checkSensors.get_sensors(PHANTOMJS_INSTALL)
+
+
 def job():
     print("ran at time {}".format(datetime.datetime.now()))
     downloaded_entries = dict()
     # download latest data from MINTS
     mints_conn = http.client.HTTPConnection(MINTS_BASE_URL)
+
+    # get all of the sensors located on the mints website using the checkSensors script.
+    sensors = mints_sensors()
+
     # initialize an emtpy list for each sensor
-    for sensor in MINTS_RESOURCES:
+    for sensor in sensors:
         downloaded_entries[sensor] = list()
 
-    for sensor in MINTS_RESOURCES:
+    for sensor in sensors:
         mints_conn.request("GET", "/api/{}/latestData.json".format(sensor))
         raw_response_body = mints_conn.getresponse().read().decode("utf-8")
         entries_json = json.loads(raw_response_body)
