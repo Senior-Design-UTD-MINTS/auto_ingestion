@@ -76,7 +76,10 @@ def job():
     for sensor in sensors:
         mints_conn.request("GET", "/api/{}/latestData.json".format(sensor))
         raw_response_body = mints_conn.getresponse().read().decode("utf-8")
-        entries_json = json.loads(raw_response_body)
+        try:
+            entries_json = json.loads(raw_response_body)
+        except ValueError:
+            continue
         for entry in entries_json["entries"]:
             downloaded_entries[sensor].append(entry)
     mints_conn.close()
