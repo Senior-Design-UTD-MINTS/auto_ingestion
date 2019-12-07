@@ -69,10 +69,6 @@ def job():
     # get all of the sensors located on the mints website using the checkSensors script.
     sensors = mints_sensors()
 
-    # initialize an emtpy list for each sensor
-    for sensor in sensors:
-        downloaded_entries[sensor] = list()
-
     for sensor in sensors:
         mints_conn.request("GET", "/api/{}/latestData.json".format(sensor))
         raw_response_body = mints_conn.getresponse().read().decode("utf-8")
@@ -80,8 +76,7 @@ def job():
             entries_json = json.loads(raw_response_body)
         except ValueError:
             continue
-        for entry in entries_json["entries"]:
-            downloaded_entries[sensor].append(entry)
+        downloaded_entries[sensor] = entries_json["entries"]
     mints_conn.close()
     # create a new json file to upload to druid
 
