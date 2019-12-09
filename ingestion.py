@@ -63,49 +63,53 @@ def mints_sensors():
 def job():
     print("ran at time {}".format(datetime.datetime.now()))
     downloaded_entries = dict()
-    # download latest data from MINTS
-    mints_conn = http.client.HTTPConnection(MINTS_BASE_URL)
+    try:
+        # download latest data from MINTS
+        mints_conn = http.client.HTTPConnection(MINTS_BASE_URL)
 
-    # get all of the sensors located on the mints website using the checkSensors script.
-    sensors = mints_sensors()
+        # get all of the sensors located on the mints website using the checkSensors script.
+        sensors = mints_sensors()
 
-    for sensor in sensors:
-        mints_conn.request("GET", "/api/{}/latestData.json".format(sensor))
-        raw_response_body = mints_conn.getresponse().read().decode("utf-8")
-        try:
-            entries_json = json.loads(raw_response_body)
-        except ValueError:
-            continue
-        downloaded_entries[sensor] = entries_json["entries"]
-    mints_conn.close()
-    # create a new json file to upload to druid
+        for sensor in sensors:
+            mints_conn.request("GET", "/api/{}/latestData.json".format(sensor))
+            raw_response_body = mints_conn.getresponse().read().decode("utf-8")
+            try:
+                entries_json = json.loads(raw_response_body)
+            except ValueError:
+                continue
+            downloaded_entries[sensor] = entries_json["entries"]
+        mints_conn.close()
+        # create a new json file to upload to druid
 
-    for sensor_id, entries in downloaded_entries.items():
-        table_name = "MINTS_" + sensor_id
-        updates_filename = "updates_{}.json".format(sensor_id)
-        update_spec_filename = "update-spec-{}.json".format(sensor_id)
-        # write entries into updates.json file
-        update_file = open(updates_filename, "w")
-        for entry in entries:
-            string = json.dumps(entry)
-            update_file.write(string)
-            update_file.write("\n")
-        update_file.close()
-        # change the table name of our updateSpec.json
-        update_table_name(table_name, updates_filename, update_spec_filename)
-        # run the script provided by druid to append to our datasource, as specified by the spec
-        script = "{}/{} --file {}/{} --url {}:{}".format(
-            DRUID_INSTALL, DRUID_UPLOAD_SCRIPT, BASE_DIR, update_spec_filename, DRUID_URL, DRUID_PORT)
-        print("attempting to execute the following script:")
-        print(script)
-        print("\n")
-        subprocess.Popen(script, shell=True)
+        for sensor_id, entries in downloaded_entries.items():
+            table_name = "MINTS_" + sensor_id
+            updates_filename = "updates_{}.json".format(sensor_id)
+            update_spec_filename = "update-spec-{}.json".format(sensor_id)
+            # write entries into updates.json file
+            update_file = open(updates_filename, "w")
+            for entry in entries:
+                string = json.dumps(entry)
+                update_file.write(string)
+                update_file.write("\n")
+            update_file.close()
+            # change the table name of our updateSpec.json
+            update_table_name(table_name, updates_filename,
+                              update_spec_filename)
+            # run the script provided by druid to append to our datasource, as specified by the spec
+            script = "{}/{} --file {}/{} --url {}:{}".format(
+                DRUID_INSTALL, DRUID_UPLOAD_SCRIPT, BASE_DIR, update_spec_filename, DRUID_URL, DRUID_PORT)
+            print("attempting to execute the following script:")
+            print(script)
+            print("\n")
+            subprocess.Popen(script, shell=True)
+    except Exception as e:
+        print(e)
 
 
 # start of script
 setup_upload_spec()
 
-schedule.every().minute.do(job)
+schedule.every(30).seconds.do(job)
 
 print("starting at time {}".format(datetime.datetime.now()))
 job()
