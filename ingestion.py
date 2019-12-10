@@ -11,6 +11,7 @@ DRUID_INSTALL_PATH_ENV_VAR = "DRUID_INSTALL_PATH"
 
 
 def get_druid_install():
+    # get druid install from environment variable
     install_path = os.environ.get(DRUID_INSTALL_PATH_ENV_VAR)
     if install_path is None:
         sys.exit("Error: System needs to have the environment variable {} set to where druid is installed on your system".format(
@@ -57,10 +58,12 @@ def update_table_name(table_name, updates_filename, update_spec_filename):
 
 
 def mints_sensors():
+    # convience method to get all the sensors from the MINTS website
     return checkSensors.get_sensors(PHANTOMJS_INSTALL)
 
 
 def job():
+    # ingestion job
     print("ran at time {}".format(datetime.datetime.now()))
     downloaded_entries = dict()
     try:
@@ -79,8 +82,11 @@ def job():
                 continue
             downloaded_entries[sensor] = entries_json["entries"]
         mints_conn.close()
-        # create a new json file to upload to druid
 
+        # we parallelize uploading the data by spawning a seperate process for each sensor.
+        # Because of that, we need seperate resources for each, so we create two files per sensor
+        # - the entries, placed in the "updates" json
+        # - the update-spec.json used by druid
         for sensor_id, entries in downloaded_entries.items():
             table_name = "MINTS_" + sensor_id
             updates_filename = "updates_{}.json".format(sensor_id)
